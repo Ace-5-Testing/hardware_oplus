@@ -1,6 +1,8 @@
+type sysfs_glove_mode, fs_type, sysfs_type;
 type sysfs_high_touch_polling_rate, fs_type, sysfs_type;
 
 allow hal_lineage_touch_default hal_oplus_touch_aidl_service:service_manager find;
+allow hal_lineage_touch_default sysfs_glove_mode:file { read write open getattr };
 allow hal_lineage_touch_default sysfs_high_touch_polling_rate:file { read write open getattr };
 
 binder_call(hal_lineage_touch_default, hal_oplus_touch_aidl)
