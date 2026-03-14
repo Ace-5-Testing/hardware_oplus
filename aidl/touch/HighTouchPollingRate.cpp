@@ -9,17 +9,13 @@
 
 #include <android-base/file.h>
 #include <android-base/logging.h>
+#include <android-base/strings.h>
 
-#include <OplusTouchConstants.h>
+#include <HighTouchPollingRateConfig.h>
 
 using ::android::base::ReadFileToString;
+using ::android::base::Trim;
 using ::android::base::WriteStringToFile;
-
-namespace {
-
-constexpr const char* kGameSwitchEnablePath = "/proc/touchpanel/game_switch_enable";
-
-}  // anonymous namespace
 
 namespace aidl {
 namespace vendor {
@@ -32,25 +28,17 @@ HighTouchPollingRate::HighTouchPollingRate(std::shared_ptr<IOplusTouch> oplusTou
 ndk::ScopedAStatus HighTouchPollingRate::getEnabled(bool* _aidl_return) {
     std::string value;
 
-    if (mOplusTouch) {
-        mOplusTouch->touchReadNodeFile(OplusTouchConstants::DEFAULT_TP_IC_ID,
-                                       OplusTouchConstants::GAME_SWITCH_ENABLE_NODE, &value);
-    } else if (!ReadFileToString(kGameSwitchEnablePath, &value)) {
-        LOG(ERROR) << "Failed to read current HighTouchPollingRate state";
+    if (!ReadFileToString(kHighTouchPollingRatePath, &value)) {
+        LOG(ERROR) << "Failed to read HighTouchPollingRate state";
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
     }
 
-    *_aidl_return = value[0] != '0';
+    *_aidl_return = Trim(value)[0] != '0';
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus HighTouchPollingRate::setEnabled(bool enable) {
-    if (mOplusTouch) {
-        int aidl_return = 0;
-        mOplusTouch->touchWriteNodeFile(OplusTouchConstants::DEFAULT_TP_IC_ID,
-                                        OplusTouchConstants::GAME_SWITCH_ENABLE_NODE,
-                                        enable ? "1" : "0", &aidl_return);
-    } else if (!WriteStringToFile(enable ? "1" : "0", kGameSwitchEnablePath, true)) {
+    if (!WriteStringToFile(enable ? "1" : "0", kHighTouchPollingRatePath, true)) {
         LOG(ERROR) << "Failed to write HighTouchPollingRate state";
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
     }
