@@ -33,17 +33,14 @@
 
 #include <VibrationEffectConfig.h>
 
-#include "VibrationEffectLoader.h"
+const struct effect_stream *get_effect_stream(uint32_t effect_id)
+{
+    int i;
 
-namespace {
-VibrationEffectLoader loader;
-};  // anonymous namespace
+    for (i = 0; i < ARRAY_SIZE(effects); i++) {
+        if (effect_id == effects[i].effect_id)
+            return &effects[i];
+    }
 
-const struct effect_stream* get_effect_stream(uint32_t effect_id) {
-    auto ret = loader.getEffectStream(effect_id);
-    if (ret) return ret;
-
-    auto it = std::find_if(std::begin(effects), std::end(effects),
-                           [&](auto&& v) { return v.effect_id == effect_id; });
-    return it != std::end(effects) ? &*it : nullptr;
+    return NULL;
 }
