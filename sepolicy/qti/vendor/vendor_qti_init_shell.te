@@ -8,6 +8,9 @@ allow vendor_qti_init_shell vendor_olog_file:dir rw_dir_perms;
 allow vendor_qti_init_shell vendor_qmcs_file:dir r_dir_perms;
 allow vendor_qti_init_shell vendor_spunvm_file:dir r_dir_perms;
 
+allow vendor_qti_init_shell proc_sched:dir search;
+allow vendor_qti_init_shell proc_sched:file { read write open };
+
 create_dir_file(vendor_qti_init_shell, mnt_vendor_file)
 
 set_prop(vendor_qti_init_shell, vendor_oplus_thermal_prop)
